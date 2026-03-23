@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>画笔遇见针线——学生美术与AI刺绣</title>
+<style>
+  /* ========== 全局与广绣氛围 ========== */
+  body {
+    margin: 0;
+    font-family: "楷体", "STKaiti", serif;
+    background-color: #f9f5ef;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23cbb89d' stroke-width='0.8'%3E%3Cpath d='M30 0v60M0 30h60'/%3E%3Cpath d='M0 0l60 60M60 0L0 60'/%3E%3C/g%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4c8b0' fill-opacity='0.07'%3E%3Cpath d='M0 20h20v20H0zM20 0h20v20H20z'/%3E%3C/g%3E%3C/svg%3E");
+    color: #4a3b2c;
+    line-height: 1.8;
+  }
+  h1, h2 {
+    text-align: center;
+    font-weight: normal;
+    letter-spacing: 0.2em;
+    color: #7a2519;
+    text-shadow: 1px 1px 2px #e8dcc9;
+  }
+  section {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  .intro {
+    font-size: 1.2em;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  /* ========== 广绣纹样边框 ========== */
+  .guangxiu-border {
+    position: relative;
+    border: 12px solid transparent;
+    border-image-slice: 24;
+    border-image-repeat: round;
+    border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cdefs%3E%3Cpattern id='gx' patternUnits='userSpaceOnUse' width='80' height='80'%3E%3Crect width='80' height='80' fill='%23a61e14'/%3E%3Cpath d='M40 10c-5 0-9 4-9 9s4 9 9 9 9-4 9-9-4-9-9-9zm0 12a3 3 0 110-6 3 3 0 010 6zM20 30c-4 0-7 3-7 7s3 7 7 7 7-3 7-7-3-7-7-7zm0 10a3 3 0 110-6 3 3 0 010 6zM60 30c-4 0-7 3-7 7s3 7 7 7 7-3 7-7-3-7-7-7zm0 10a3 3 0 110-6 3 3 0 010 6z' fill='none' stroke='%23d4af37' stroke-width='1.5'/%3E%3Cpath d='M10 60 Q40 20 70 60' fill='none' stroke='%23d4af37' stroke-width='2'/%3E%3Ccircle cx='10' cy='60' r='3' fill='%23d4af37'/%3E%3Ccircle cx='70' cy='60' r='3' fill='%23d4af37'/%3E%3C/svg%3E%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23gx)'/%3E%3C/svg%3E");
+  }
+  .guangxiu-border::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    pointer-events: none;
+    border: 4px solid #f7e4b2;
+    border-radius: 4px;
+  }
+  .pair.guangxiu-border:hover {
+    filter: brightness(1.08);
+    transition: filter 0.3s ease;
+  }
+
+  /* ========== 画廊网格 ========== */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+  }
+  .pair {
+    background: rgba(255,255,255,0.75);
+    box-shadow: 2px 2px 8px rgba(122,37,25,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .pair:hover {
+    transform: translateY(-6px);
+    box-shadow: 4px 6px 16px rgba(122,37,25,0.2);
+  }
+  .pair img {
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .pair img:hover {
+    transform: scale(1.05);
+  }
+  .caption {
+    padding: 12px;
+    font-size: 0.95em;
+    text-align: center;
+    background: #f2ece1;
+  }
+
+  /* ========== 全屏弹窗 ========== */
+  #overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  #overlay img {
+    max-width: 90%;
+    max-height: 90%;
+    border: 4px solid #fff;
+    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+  }
+  #overlay.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ========== 响应式 ========== */
+  @media (max-width: 600px) {
+    h1 { font-size: 1.5em; }
+    section { padding: 20px 10px; }
+    .gallery { gap: 20px; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- 首页封面 -->
+<header style="padding:60px 20px 40px;">
+  <h1>画笔遇见针线</h1>
+  <p class="intro">学生美术作品 × AI刺绣 · 在传统广绣意境中绽放创意</p>
+</header>
+
+<!-- 项目缘起 -->
+<section>
+  <h2>项目缘起</h2>
+  <p class="intro">我们想让孩子的画笔不止停留在纸上，更通过人工智能与刺绣工艺，化为可触可感的立体艺术。以广绣的温润色彩与细腻针法为灵感，探索科技与传统的温柔对话。</p>
+</section>
+
+<!-- 作品展示 -->
+<section>
+  <h2>学生美术 & AI刺绣作品</h2>
+  <div class="gallery">
+    <!-- 第1组 -->
+    <div class="pair guangxiu-border">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23fcefe8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='20' fill='%237a2519'%3E学生原画 ①%3C/text%3E%3C/svg%3E" alt="学生原画1" onclick="showFull(this)" />
+      <div class="caption">《春涧》· 水彩 · 灵感来自山间晨雾</div>
+    </div>
+    <div class="pair guangxiu-border">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23f3efe2'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='20' fill='%237a2519'%3EAI刺绣 ①%3C/text%3E%3C/svg%3E" alt="AI刺绣1" onclick="showFull(this)" />
+      <div class="caption">AI刺绣版《春涧》· 保留水彩晕染的柔光，针脚模拟丝线光泽</div>
+    </div>
+
+    <!-- 第2组 -->
+    <div class="pair guangxiu-border">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23fdf6ed'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='20' fill='%237a2519'%3E学生原画 ②%3C/text%3E%3C/svg%3E" alt="学生原画2" onclick="showFull(this)" />
+      <div class="caption">《蝶舞繁花》· 彩铅 · 捕捉春日生机</div>
+    </div>
+    <div class="pair guangxiu-border">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23f3efe2'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='20' fill='%237a2519'%3EAI刺绣 ②%3C/text%3E%3C/svg%3E" alt="AI刺绣2" onclick="showFull(this)" />
+      <div class="caption">AI刺绣版《蝶舞繁花》· 彩铅线条化作丝线肌理</div>
+    </div>
+  </div>
+</section>
+
+<!-- 全屏弹窗容器 -->
+<div id="overlay" onclick="hideFull()">
+  <img src="" alt="全屏查看" />
+</div>
+
+<script>
+  function showFull(img) {
+    const overlay = document.getElementById('overlay');
+    const fullImg = overlay.querySelector('img');
+    fullImg.src = img.src;
+    overlay.classList.add('show');
+  }
+  function hideFull() {
+    document.getElementById('overlay').classList.remove('show');
+  }
+</script>
+
+</body>
+</html>
